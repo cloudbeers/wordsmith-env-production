@@ -36,6 +36,11 @@ spec:
                 sh "kubectl get svc,ingress -n ${namespace} -o yaml"
             }
         }
+        stage("Check endpoint") {
+            container('curl') {
+                sh "curl https://api.wordsmith.beescloud.com/actuator/info"
+            }
+        }
     }
 
 }
