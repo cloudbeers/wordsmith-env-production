@@ -1,2 +1,4 @@
+# Namespace to use for deployment
 namespace: production
+# Active environment: preview or staging
 active: staging
