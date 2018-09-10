@@ -1,4 +1,4 @@
-def label = "$env.JOB_NAME-${UUID.randomUUID().toString()}"
+def label = "$env.JOB_BASE_NAME-${UUID.randomUUID().toString()}"
 podTemplate(label: label, yaml: """
 apiVersion: v1
 kind: Pod
