@@ -1,2 +1,2 @@
 namespace: production
-active: preview
+active: staging
