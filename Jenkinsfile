@@ -24,13 +24,17 @@ spec:
             def activeEnvironment = environment["active"]
             def namespace = environment["namespace"]
 
+            stage("Apply configuration") {
             sh """
                 sed -e 's/NAMESPACE/${namespace}/g' \
                 -e 's/ACTIVEENVIRONMENT/${activeEnvironment}/g' \
                 production.yaml | kubectl apply -f - 
             """
+            }
 
-            sh "kubectl get svc,ingress -n ${namespace} -o yaml"
+            stage("Check configuration") {
+                sh "kubectl get svc,ingress -n ${namespace} -o yaml"
+            }
         }
     }
 
