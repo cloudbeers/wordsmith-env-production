@@ -1,0 +1,26 @@
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: wordsmith-api-NAMESPACE-wordsmith-api
+  namespace: NAMESPACE
+  labels:
+    app: wordsmith-api
+spec:
+  rules:
+    - host: api.wordsmith.beescloud.com
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: wordsmith-api-facade-wordsmith-api
+              servicePort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wordsmith-api-facade-wordsmith-api
+  namespace: NAMESPACE
+spec:
+  type: ExternalName
+  externalName: wordsmith-api-ACTIVEENVIRONMENT-wordsmith-api.ACTIVEENVIRONMENT.svc.cluster.local
