@@ -1,4 +1,28 @@
-# Namespace to use for deployment
+kind: deploymentPlan
 namespace: production
-# Active environment: preview or staging
-active: staging
+active: production
+
+database:
+  liquibaseLevel: 1.2.3
+  credentials:
+    PG_SQL_CREDS: 
+      jenkinsCredentialsId: postgresql.production
+applications:
+  - release: wordsmith-api-production
+    chart: wordsmith/wordsmith-api
+    version: 1.0.10
+    probe: https://api.production.wordsmith.beescloud.com/actuator/health
+    values: wordsmith-api/values.yaml
+    credentials:
+      - jenkinsCredentialsId: postgresql.production
+        helmUsernameParameter: database.username
+        helmPasswordParameter: database.password
+  - release: wordsmith-front-production
+    chart: wordsmith/wordsmith-front
+    version: 20180910-2020
+    probe: https://front.production.wordsmith.beescloud.com/
+    values: wordsmith-front/values.yaml
+
+
+
+

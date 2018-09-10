@@ -1,0 +1,7 @@
+image:
+  pullPolicy: Always
+ingress:
+  hosts:
+    - front.production.wordsmith.beescloud.com
+api:
+  url: api.production.wordsmith.beescloud.com
