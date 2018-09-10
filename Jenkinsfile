@@ -20,7 +20,7 @@ spec:
     node(label) {
         checkout scm
         container('kubectl') {
-            def environment = readYaml("environment.yaml")
+            def environment = readYaml file:"environment.yaml"
             def activeEnvironment = environment["active"]
             def namespace = environment["namespace"]
 
@@ -29,6 +29,8 @@ spec:
                 -e 's/ACTIVEENVIRONMENT/${activeEnvironment}/g' \
                 production.yaml | kubectl apply -f - 
             """
+
+            sh "kubectl get svc,ingress -n ${namespace} -o yaml"
         }
     }
 
