@@ -27,6 +27,7 @@ spec:
       tty: true
 """
     ) {
+  properties([disableConcurrentBuilds()])
   node (label) {
     def environment
     stage('Load Environment Definition') {
@@ -36,7 +37,7 @@ spec:
     stage('Update database') {
       container('jdk') {
         dir ('target/wordsmith-db') {
-          git "https://github.com/cloudbeers/wordsmith-db.git"
+          sh "git clone https://github.com/cloudbeers/wordsmith-db.git ."
 
           withEnv(["PG_SQL_JDBC_URL=${environment.database.url}"]) {
 
