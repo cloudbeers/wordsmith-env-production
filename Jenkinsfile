@@ -20,13 +20,58 @@ spec:
       command:
       - cat
       tty: true
+    - name: jdk
+      image: openjdk:8-jdk
+      command:
+      - cat
+      tty: true
 """
     ) {
   node (label) {
+    def environment
+    stage('Load Environment Definition') {
+      checkout scm
+      environment = readYaml file: 'environment.yaml'
+    }
+    stage('Update database') {
+      container('jdk') {
+        dir ('target/wordsmith-db') {
+          git "https://github.com/cloudbeers/wordsmith-db.git"
+
+          withEnv(["PG_SQL_JDBC_URL=${environment.database.url}"]) {
+
+            withCredentials([usernamePassword(
+             credentialsId: "${environment.database.credentials.jenkinsCredentialsId}", 
+             passwordVariable: 'PG_SQL_CREDS_PSW', usernameVariable: 'PG_SQL_CREDS_USR')]) {
+
+              MAVEN_OPTS="--batch-mode -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn"
+
+              sh "./mvnw $MAVEN_OPTS validate"
+
+              for (liquibaseChangeLog in environment.database.liquibaseChangeLogs) {
+                changeLogFile = "src/main/liquibase/changelog-${liquibaseChangeLog}.xml"
+                sh """
+                   # Display all changes which will be applied by the Update command
+                   ./mvnw $MAVEN_OPTS liquibase:status -Dliquibase.changeLogFile=${changeLogFile} $MAVEN_OPTS
+                   
+                   # Update the database
+                   ./mvnw $MAVEN_OPTS liquibase:update -Dliquibase.changeLogFile=${changeLogFile} $MAVEN_OPTS
+                """
+                archiveArtifacts artifacts: changeLogFile, fingerprint: true
+              } // for
+
+              DB_TAG_VERSION = readFile("target/VERSION")
+              sh """
+                # Create a tag in order to rollback if needed
+                ./mvnw $MAVEN_OPTS liquibase:tag -Dliquibase.tag=${DB_TAG_VERSION}
+              """
+            } // withCredentials
+          } // withEnvironment
+         } // dir
+      } // container
+    } // stage
     stage('Install Helm Charts') {
         container('helm') {
-          checkout scm
-          def environment = readYaml file: 'environment.yaml'
           sh """
              helm init --client-only
              helm repo add wordsmith https://charts.wordsmith.beescloud.com
@@ -60,7 +105,7 @@ spec:
                   jiraResponse = jiraNewIssue issue: deploymentIssue
                   echo "https://jira.beescloud.com/projects/WOR/issues/${jiraResponse.data.key}"
                   throw e
-                }                
+                }
               }
           }
           archiveArtifacts artifacts: "*.tgz", fingerprint: true
@@ -71,7 +116,7 @@ spec:
              issuetype: [name: 'Task']]]
 
           jiraResponse = jiraNewIssue issue: deploymentIssue
-          echo "https://jira.beescloud.com/projects/WOR/issues/${jiraResponse.data.key}"
+          echo "Jira verification task created https://jira.beescloud.com/projects/WOR/issues/${jiraResponse.data.key}"
         } // container
     } // stage
   } // node
