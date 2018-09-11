@@ -52,10 +52,10 @@ spec:
                 changeLogFile = "src/main/liquibase/changelog-${liquibaseChangeLog}.xml"
                 sh """
                    # Display all changes which will be applied by the Update command
-                   ./mvnw $MAVEN_OPTS liquibase:status -Dliquibase.changeLogFile=${changeLogFile} $MAVEN_OPTS
+                   ./mvnw $MAVEN_OPTS liquibase:status -Dliquibase.changeLogFile=${changeLogFile}
                    
                    # Update the database
-                   ./mvnw $MAVEN_OPTS liquibase:update -Dliquibase.changeLogFile=${changeLogFile} $MAVEN_OPTS
+                   ./mvnw $MAVEN_OPTS liquibase:update -Dliquibase.changeLogFile=${changeLogFile}
                 """
                 archiveArtifacts artifacts: changeLogFile, fingerprint: true
               } // for
