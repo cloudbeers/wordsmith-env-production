@@ -1,6 +1,8 @@
 replicaCount: 2
 image:
   pullPolicy: Always
+service:
+  selectByRelease: false
 ingress:
   hosts:
     - front.production.wordsmith.beescloud.com

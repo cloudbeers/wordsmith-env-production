@@ -21,11 +21,11 @@ applications:
         helmPasswordParameter: database.password
   - release: wordsmith-front-production
     chart: wordsmith/wordsmith-front
-    version: 20180910-2020
+    version: 20180912-0826
     probe: https://front.production.wordsmith.beescloud.com/
     values: wordsmith-front/values.yaml
   - release: www-production-canary
     chart: wordsmith/wordsmith-front
-    version: 20180910-2020
+    version: 20180912-0828
     probe: https://front-canary.production.wordsmith.beescloud.com/
     values: wordsmith-front/values-canary.yaml
