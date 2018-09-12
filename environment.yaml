@@ -29,3 +29,7 @@ applications:
     version: "20180912.0859"
     probe: https://front-canary.production.wordsmith.beescloud.com/
     values: wordsmith-front/values-canary.yaml
+  - release: wordsmith-another-api-production
+    chart: wordsmith/wordsmith-another-api
+    version: 20180912-0831
+    values: wordsmith-another-api/values.yaml
